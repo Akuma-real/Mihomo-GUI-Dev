@@ -53,6 +53,33 @@ starting a development server on `localhost:3000`.
 Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd> in a Chromium based WebView (e.g. on
 Windows) to open the web developer console from the Tauri window.
 
+#### Linux (Wayland + NVIDIA) 兼容性说明
+
+在部分 Linux（如 Fedora/KDE Wayland）且使用 NVIDIA GPU 的环境下，WebKitGTK 可能无法通过 GBM/DMABUF 分配缓冲区，报错类似：
+
+```
+Failed to create GBM buffer of size 800x600: Invalid argument
+```
+
+本模板已默认内置“兼容优先”的启动参数（仅 Linux）：
+
+- 默认设置 `WEBKIT_DISABLE_DMABUF_RENDERER=1`，禁用 DMABUF 渲染提高兼容性。
+- 若检测到当前会话为 Wayland 且未手动指定 `GDK_BACKEND`，则强制 `GDK_BACKEND=x11`（经由 XWayland 运行）。
+
+你仍可在外部覆盖这些默认值：
+
+- 保持 Wayland：`GDK_BACKEND=wayland pnpm tauri dev`
+- 重新启用 DMABUF（若你的栈已支持）：`WEBKIT_DISABLE_DMABUF_RENDERER=0 pnpm tauri dev`
+- 兜底（进一步降低 GPU 依赖）：`WEBKIT_DISABLE_COMPOSITING_MODE=1 pnpm tauri dev` 或 `LIBGL_ALWAYS_SOFTWARE=1 pnpm tauri dev`
+
+另外提供了便捷脚本（开发期）：
+
+```shell
+pnpm run tauri:dev:compat
+```
+
+提示：`Failed to load module "appmenu-gtk-module"` 一般可忽略。
+
 ### Building for release
 
 To export the Next.js frontend via SSG and build the Tauri application for release:
