@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "tauri": "tauri",
+    "tauri:dev": "WEBKIT_DISABLE_DMABUF_RENDERER=1 tauri dev",
+    "tauri:build": "WEBKIT_DISABLE_DMABUF_RENDERER=1 tauri build"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
@@ -19,6 +22,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@tauri-apps/cli": "^2.9.2",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
