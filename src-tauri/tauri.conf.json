@@ -1,18 +1,18 @@
 {
-  "$schema": "https://schema.tauri.app/config/2",
-  "productName": "tauri-nextjs-template",
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "mihomo-gui",
   "version": "0.1.0",
   "identifier": "com.tauri.dev",
   "build": {
-    "beforeDevCommand": "pnpm dev",
+    "frontendDist": "../out",
     "devUrl": "http://localhost:3000",
-    "beforeBuildCommand": "pnpm build",
-    "frontendDist": "../dist"
+    "beforeDevCommand": "pnpm dev",
+    "beforeBuildCommand": "pnpm build"
   },
   "app": {
     "windows": [
       {
-        "title": "tauri-nextjs-template",
+        "title": "mihomo-gui",
         "width": 800,
         "height": 600,
         "resizable": true,
