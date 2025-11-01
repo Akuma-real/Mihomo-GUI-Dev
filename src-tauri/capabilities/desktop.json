@@ -1,0 +1,12 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "desktop",
+  "description": "Desktop permissions",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "core:window:default",
+    "core:tray:default",
+    "log:default"
+  ]
+}
