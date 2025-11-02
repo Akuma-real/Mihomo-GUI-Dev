@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 use std::process::{Child, Command, Stdio};
+use std::io::{BufRead, BufReader};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CoreStatus {
@@ -47,7 +48,36 @@ impl CoreManager {
     cmd.stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::piped());
 
     match cmd.spawn() {
-      Ok(child) => {
+      Ok(mut child) => {
+        // 将子进程的 stdout/stderr 转发到日志，便于在 dev 终端观察运行日志
+        if let Some(stdout) = child.stdout.take() {
+          std::thread::spawn(move || {
+            let reader = BufReader::new(stdout);
+            for line in reader.lines() {
+              match line {
+                Ok(l) => log::info!(target: "mihomo-core", "[stdout] {}", l),
+                Err(e) => {
+                  log::error!(target: "mihomo-core", "读取 stdout 失败: {}", e);
+                  break;
+                }
+              }
+            }
+          });
+        }
+        if let Some(stderr) = child.stderr.take() {
+          std::thread::spawn(move || {
+            let reader = BufReader::new(stderr);
+            for line in reader.lines() {
+              match line {
+                Ok(l) => log::warn!(target: "mihomo-core", "[stderr] {}", l),
+                Err(e) => {
+                  log::error!(target: "mihomo-core", "读取 stderr 失败: {}", e);
+                  break;
+                }
+              }
+            }
+          });
+        }
         self.child = Some(child);
         self.status = CoreStatus::Running;
         Ok(())

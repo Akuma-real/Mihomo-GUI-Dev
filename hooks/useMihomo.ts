@@ -14,8 +14,9 @@ export function useMihomo() {
     try {
       await invoke('start_core', { configPath, needPrivilege: false })
       setStatus('running')
-    } catch (err: any) {
-      setError(err?.message ?? '启动失败')
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err)
+      setError(msg || '启动失败')
       setStatus('error')
     } finally {
       setIsLoading(false)
@@ -28,8 +29,9 @@ export function useMihomo() {
     try {
       await invoke('stop_core')
       setStatus('stopped')
-    } catch (err: any) {
-      setError(err?.message ?? '停止失败')
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err)
+      setError(msg || '停止失败')
     } finally {
       setIsLoading(false)
     }
@@ -49,4 +51,3 @@ export function useMihomo() {
 
   return { status, isLoading, error, start, stop }
 }
-

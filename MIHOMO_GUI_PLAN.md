@@ -844,8 +844,7 @@ pub async fn open_webui(
 }
 ```
 
-### 4.4 已实现命令（当前）
-- 核心管理：`start_core`、`stop_core`、`restart_core`、`get_core_status`、`set_core_path`、`get_core_path`
+- 核心管理：`start_core`、`stop_core`、`restart_core`、`get_core_status`
 - 版本管理：`fetch_latest_version`（从 release 资产 `version.txt` 读取版本号）
 - 配置管理：`load_all_configs`、`validate_config`、`import_config`、`export_config`
 
@@ -1413,6 +1412,16 @@ export function WebUIControl() {
 ### 5.6 路由与导航
 - 根路由 `/` 已重定向到 `/core`，以便桌面端默认展示核心页面。
 
+### 5.7 安装进度与错误提示
+- 版本切换器组件监听 `version_install_progress` 事件，展示阶段与进度条。
+- 阶段示例：开始下载(10%) → 完成(100%)；错误时展示详细信息。
+- 后续可进一步细化为按字节下载进度（流式下载与解压阶段进度）。
+
+### 5.8 核心路径策略
+- 移除“手动设置内核路径”入口，统一采用固定路径：`…/mihomo-gui/cores/current/mihomo(.exe)`。
+- “下载并安装”后自动更新为当前路径；启动时自动探测并使用该路径。
+- UI 仅提供“刷新默认路径”用于重新读取并显示该路径（无需手动输入）。
+
 ## 6. Tauri 权限配置
 
 ### 6.1 capabilities/desktop.json
@@ -1443,11 +1452,12 @@ export function WebUIControl() {
 ### 第二阶段：核心功能 (1-2周)
 - [ ] 实现内核版本管理 (VersionManager)
   - 已完成：基于 `MetaCubeX/mihomo` 读取 `version.txt` 的最新版本查询（稳定版/开发版）
-  - 待实现：下载、校验（sha256）、解压与安装
+  - 已完成：下载、校验（sha256，存在校验文件则验证）、解压与安装，自动更新 `core_path`
 - [x] 开发进程生命周期管理（启动/停止/重启、状态查询）
 - [x] 实现配置文件导入/导出/验证（轻量 YAML 校验）
 - [ ] 创建核心控制 UI 组件（目前提供最小启动/停止界面）
-- [x] 实现版本切换器组件（最小功能：渠道切换/查询最新、设置内核路径）
+- [x] 实现版本切换器组件（渠道切换/查询最新、设置内核路径、下载并安装）
+  - 新增：实时安装进度条与错误提示，固定安装目录展示。
 
 ### 第三阶段：系统集成 (1周)
 - [ ] 实现权限检测与提升逻辑
@@ -1482,10 +1492,14 @@ export function WebUIControl() {
 - **语法验证**: 实时检查配置文件语法
 
 ### 8.3 内核管理
-- **版本存储**: `~/.cache/mihomo-gui/cores/`
+- **版本存储**: `数据目录/mihomo-gui/cores/`（跨平台规范路径）
+  - Linux: `~/.local/share/mihomo-gui/cores/`
+  - macOS: `~/Library/Application Support/mihomo-gui/cores/`
+  - Windows: `%APPDATA%\mihomo-gui\cores\`
 - **自动下载**: 从官方 GitHub Releases 获取
 - **校验和验证**: SHA256 校验下载文件
-- **回滚机制**: 支持版本回退
+- **当前版本路径**: `cores/current/mihomo(.exe)` 固定为当前内核；安装完成后拷贝至此路径；应用启动时自动采用该路径
+- **回滚机制**: 支持版本回退（后续：切换 `current` 指向或拷贝）
 
 ### 8.4 错误处理
 - **进程崩溃**: 自动重启机制

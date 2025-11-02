@@ -23,8 +23,15 @@ serde = { version = "1.0", features = ["derive"] }
 log = "0.4"
 tauri = { version = "2.9.2", features = [] }
 tauri-plugin-log = "2"
+tauri-plugin-dialog = "2"
 dirs = "5"
 serde_yaml = "0.9"
 anyhow = "1"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
-reqwest = { version = "0.12", features = ["json", "rustls-tls"] }
+reqwest = { version = "0.12", features = ["json", "rustls-tls", "stream"] }
+zip = { version = "0.6", default-features = false, features = ["deflate"] }
+flate2 = "1"
+tar = "0.4"
+sha2 = "0.10"
+futures-util = "0.3"
+libc = "0.2"
